@@ -5,18 +5,28 @@ import { createToken, setTokenCookie, errorResponse } from '@/helpers/tokenHelpe
 
 export async function POST(request: Request) {
     try {
-        await connect();
-
-        const { email, password } = await request.json();
-
-        // Check if user exists
+        await connect();        const { email, password: rawPassword } = await request.json();
+        const password = rawPassword.trim(); // Remove any whitespace        // Check if user exists
         const user = await User.findOne({ email });
         if (!user) {
+            console.log('User not found:', email);
             return errorResponse("User does not exist", 404);
         }
 
-        // Verify password
+        console.log('Database user found:', {
+            email: user.email,
+            storedHash: user.password,
+            receivedPasswordLength: password.length,
+        });// Verify password
+        console.log('Attempting password verification:', {
+            receivedPassword: password,
+            storedHashedPassword: user.password,
+            salt: user.password.split('$')[2] // bcrypt salt is in the 3rd section
+        });
+        
         const validPassword = await bcrypt.compare(password, user.password);
+        console.log('Password comparison result:', validPassword);
+        
         if (!validPassword) {
             return errorResponse("Invalid password", 401);
         }

@@ -13,11 +13,17 @@ export async function POST(request: Request) {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return errorResponse("User already exists", 400);
-        }
-
+        }       
+        
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        
+        console.log('Creating new user:', {
+            email,
+            passwordLength: password.length,
+            hashedPassword
+        });
 
         // Create new user
         const newUser = await User.create({

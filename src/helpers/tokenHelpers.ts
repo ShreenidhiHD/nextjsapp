@@ -3,8 +3,7 @@ import { NextResponse } from 'next/server';
 
 // Token creation helper
 export const createToken = (userId: string) => {
-    try {
-        const token = jwt.sign({ id: userId }, process.env.TOKEN_SECRET!, {
+    try {        const token = jwt.sign({ id: userId }, process.env.JWT_SECRET!, {
             expiresIn: "7d"
         });
         return token;
@@ -18,8 +17,7 @@ export const createToken = (userId: string) => {
 
 // Token validation helper
 export const validateToken = (token: string) => {
-    try {
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET!);
+    try {        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
         return decoded;
     } catch {
         throw new Error("Invalid token");
